@@ -166,12 +166,12 @@ class PieChartPainter extends CustomPainter {
         _drawPoint(canvas, arrowEndPoint);
 
         // vẽ text ở chính giữa line ngang
-        final middleHorizontalArrowPoint = (bisectorEndPoint + arrowEndPoint) / 2;
+        final horizontalLineMidPoint = (bisectorEndPoint + arrowEndPoint) / 2;
         canvas.drawText(
           '$percent%',
           textStyle,
-          middleHorizontalArrowPoint.dx,
-          middleHorizontalArrowPoint.dy,
+          horizontalLineMidPoint.dx,
+          horizontalLineMidPoint.dy,
           TextAlignment.bottomCenter,
         );
       } else {
@@ -217,12 +217,12 @@ class PieChartPainter extends CustomPainter {
           );
 
           // vẽ text ở chính giữa line ngang
-          final middleHorizontalArrowPoint = (bisectorEndPoint + arrowEndPoint) / 2;
+          final horizontalLineMidPoint = (bisectorEndPoint + arrowEndPoint) / 2;
           canvas.drawText(
             '$percent%',
             textStyle,
-            middleHorizontalArrowPoint.dx,
-            middleHorizontalArrowPoint.dy,
+            horizontalLineMidPoint.dx,
+            horizontalLineMidPoint.dy,
             TextAlignment.bottomCenter,
           );
         } else {
@@ -278,12 +278,12 @@ class PieChartPainter extends CustomPainter {
           );
 
           // vẽ text ở chính giữa line ngang
-          final middleHorizontalArrowPoint = (bisectorEndPoint + arrowEndPoint) / 2;
+          final horizontalLineMidPoint = (bisectorEndPoint + arrowEndPoint) / 2;
           canvas.drawText(
             '$percent%',
             textStyle,
-            middleHorizontalArrowPoint.dx,
-            middleHorizontalArrowPoint.dy,
+            horizontalLineMidPoint.dx,
+            horizontalLineMidPoint.dy,
             TextAlignment.bottomCenter,
           );
 
