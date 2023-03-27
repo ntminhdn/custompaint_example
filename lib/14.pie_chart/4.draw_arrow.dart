@@ -63,7 +63,7 @@ class PieChartPainter extends CustomPainter {
     Colors.orange,
   ];
 
-  static const minPercentToIncludeIcon = 12; // pie nào >= 12% thì mới vẽ icon ở trong
+  static const minPercentToDrawIconInside = 12; // pie nào >= 12% thì mới vẽ icon ở trong
   static const maximumIconSize = 40; // = icon size là 30 + 10 (khoảng cách an toàn giữa các icon)
   static const iconSize = Size(30, 30);
 
@@ -132,7 +132,7 @@ class PieChartPainter extends CustomPainter {
       final intersectionPointY = r * sin(startAngle + halfSweepAngle);
 
       // nếu % >=12% thì vẽ icon bên trong pie
-      if (percent > minPercentToIncludeIcon) {
+      if (percent > minPercentToDrawIconInside) {
         // lấy vector phân giác nhân factor để kéo dài tia phân giác ra 1 xí
         final bisectorEndPoint = Offset(intersectionPointX, intersectionPointY) * realBisectorAndRadiusFactor;
 

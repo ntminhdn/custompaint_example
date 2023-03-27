@@ -63,7 +63,7 @@ class PieChartPainter extends CustomPainter {
     Colors.orange,
   ];
 
-  static const minPercentToIncludeIcon = 12; // pie nào >= 12% thì mới vẽ icon ở trong
+  static const minPercentToDrawIconInside = 12; // pie nào >= 12% thì mới vẽ icon ở trong
 
   static const textStyle = TextStyle(fontSize: 13, color: Colors.black);
 
@@ -112,7 +112,7 @@ class PieChartPainter extends CustomPainter {
       final sweepAngle = (2 * pi * percent) / 100;
 
       // nếu % >=12% thì vẽ icon bên trong pie
-      if (percent > minPercentToIncludeIcon) {
+      if (percent > minPercentToDrawIconInside) {
         // vẽ pie
         _drawPie(canvas, colors.elementAtOrNull(i), r, startAngle, sweepAngle);
       } else {
