@@ -44,44 +44,77 @@ class MyCustomPainter extends CustomPainter {
     final widgetWidth = size.width;
     final widgetHeight = size.height;
 
-    // from mobilefish
-    const leftTemp0 = Offset(124, 44);
-    const leftTemp50 = Offset(119, 354);
-    const leftTemp70 = Offset(166, 473);
-    const leftTemp100 = Offset(124, 686);
-    final leftTempControlPoints =
-        getControlPointsOfCubic(0.5, leftTemp50, 0.7, leftTemp70, leftTemp0, leftTemp100);
+    // local function giúp mình đỡ truyền đi truyền lại 4 biến imageWidth, imageHeight, widgetHeight, widgetWidth
+    Offset getWidgetOffset({required Offset imageOffset}) {
+      return interpolate(
+        imageOffset: imageOffset,
+        widgetWidth: widgetWidth,
+        widgetHeight: widgetHeight,
+        imageWidth: imageWidth,
+        imageHeight: imageHeight,
+      );
+    }
 
-    final leftP0 = interpolate(leftTemp0, widgetWidth, widgetHeight, imageWidth, imageHeight);
-    final leftP1 =
-        interpolate(leftTempControlPoints[0], widgetWidth, widgetHeight, imageWidth, imageHeight);
-    final leftP2 =
-        interpolate(leftTempControlPoints[1], widgetWidth, widgetHeight, imageWidth, imageHeight);
-    final leftP3 = interpolate(leftTemp100, widgetWidth, widgetHeight, imageWidth, imageHeight);
+    // Để vẽ cubic curve, ta cần toạ độ điểm đầu, điểm cuối và 2 toạ độ bất kỳ từ mobilefish
+    const leftMobileFishStart = Offset(124, 44);
+    const leftMobileFish50 = Offset(119, 354);
+    const leftMobileFish70 = Offset(166, 473);
+    const leftMobileFishEnd = Offset(124, 686);
 
+    // Nhờ 4 điểm trên mà ta tìm được toạ độ 2 điểm control nhờ hàm này
+    // Chú ý đây chỉ là 2 điểm control point tương ứng với mobilefish, chưa phải tương ứng với size của widget
+    final leftMobileFishControlPoints = getControlPointsOfCubic(
+      t1: 0.5,
+      pointAtT1: leftMobileFish50,
+      t2: 0.7,
+      pointAtT2: leftMobileFish70,
+      startPoint: leftMobileFishStart,
+      endPoint: leftMobileFishEnd,
+    );
+
+    // từ toạ độ mobilefish, ta nội suy ra toạ độ tương ứng với size của widget
+    final leftStart = getWidgetOffset(imageOffset: leftMobileFishStart);
+    final leftControl1 = getWidgetOffset(imageOffset: leftMobileFishControlPoints[0]);
+    final leftControl2 = getWidgetOffset(imageOffset: leftMobileFishControlPoints[1]);
+    final leftEnd = getWidgetOffset(imageOffset: leftMobileFishEnd);
+
+    // vẽ xong leftPath
     final leftPath = Path()
-      ..moveTo(leftP0.dx, leftP0.dy)
-      ..cubicTo(leftP1.dx, leftP1.dy, leftP2.dx, leftP2.dy, leftP3.dx, leftP3.dy);
+      ..moveTo(leftStart.dx, leftStart.dy)
+      ..cubicTo(leftControl1.dx, leftControl1.dy, leftControl2.dx, leftControl2.dy, leftEnd.dx, leftEnd.dy);
 
+    // dùng phép tịnh tiến để vẽ nhanh rightPath từ leftPath
     const shiftVector = Offset(180, 0);
     final rightPath = leftPath.shift(shiftVector);
 
-    const centerTemp0 = leftTemp70;
-    // from mobilefish
-    const centerTemp50 = Offset(256, 526);
-    final centerTemp100 = leftTemp70 + shiftVector;
-    final centerTempControlPoint =
-        getControlPointOfQuadratic(0.5, centerTemp50, centerTemp0, centerTemp100);
+    // vẽ cái túi thần kỳ ở giữa dòng sông
+    // điểm đầu và điểm cuối trùng với 2 nhánh dòng sông rồi nên khỏi cần lấy toạ độ từ mobifish nữa
+    const pocketMobileFishStart = leftMobileFish70;
+    final pocketMobileFishEnd = leftMobileFish70 + shiftVector;
 
-    final centerP0 = interpolate(centerTemp0, widgetWidth, widgetHeight, imageWidth, imageHeight);
-    final centerP1 =
-        interpolate(centerTempControlPoint, widgetWidth, widgetHeight, imageWidth, imageHeight);
-    final centerP2 = centerP0 + shiftVector;
+    // Để vẽ Quadratic curve, ta cần lấy thêm điểm chính giữa túi từ mobilefish
+    const pocketMobileFish50 = Offset(256, 526);
+
+    // Nhờ 3 điểm trên mà ta tìm được toạ độ điểm control nhờ hàm này
+    // Chú ý đây chỉ là điểm control point tương ứng với mobilefish, chưa phải tương ứng với size của widget
+    final pocketMobileFishControlPoint = getControlPointOfQuadratic(
+      t: 0.5,
+      pointAtT: pocketMobileFish50,
+      startPoint: pocketMobileFishStart,
+      endPoint: pocketMobileFishEnd,
+    );
+
+    // từ toạ độ mobilefish, ta nội suy ra toạ độ tương ứng với size của widget
+    final pocketStart = getWidgetOffset(imageOffset: pocketMobileFishStart);
+    final pocketControl = getWidgetOffset(imageOffset: pocketMobileFishControlPoint);
+    final pocketEnd = pocketStart + shiftVector;
+
+    // vẽ cái túi thần kỳ
     final centerPath = Path()
-      ..moveTo(centerP0.dx, centerP0.dy)
-      ..quadraticBezierTo(centerP1.dx, centerP1.dy, centerP2.dx, centerP2.dy)
+      ..moveTo(pocketStart.dx, pocketStart.dy)
+      ..quadraticBezierTo(pocketControl.dx, pocketControl.dy, pocketEnd.dx, pocketEnd.dy)
       ..close();
-
+    
     canvas.drawPath(leftPath, whitePaint);
     canvas.drawPath(rightPath, whitePaint);
     canvas.drawPath(centerPath, whitePaint);

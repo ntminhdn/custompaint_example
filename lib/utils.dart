@@ -22,7 +22,13 @@ extension ListExt<T> on List<T> {
 }
 
 extension CanvasExt on Canvas {
-  void drawText(String text, TextStyle textStyle, double x, double y, TextAlignment alignment) {
+  void drawText({
+    required String text,
+    required TextStyle textStyle,
+    required double x,
+    required double y,
+    required TextAlignment alignment,  
+  }) {
     final span = TextSpan(
       style: textStyle,
       text: text,
@@ -100,7 +106,13 @@ enum TextAlignment {
 }
 
 // Hàm xác định một điểm thuộc đường cong bậc 2 tại vị trí `t` nào đó
-Offset getOffsetOfCubicAt(double t, Offset start, Offset control1, Offset control2, Offset end) {
+Offset getOffsetOfCubicAt({
+  required double t,
+  required Offset start,
+  required Offset control1,
+  required Offset control2,
+  required Offset end,
+}) {
   return start * pow(1 - t, 3).toDouble() +
       control1 * 3 * pow(1 - t, 2).toDouble() * t +
       control2 * 3 * (1 - t) * pow(t, 2).toDouble() +
@@ -108,27 +120,42 @@ Offset getOffsetOfCubicAt(double t, Offset start, Offset control1, Offset contro
 }
 
 // Hàm xác định một điểm thuộc đường cong bậc 3 tại vị trí `t` nào đó
-Offset getOffsetOfQuadraticAt(double t, Offset start, Offset control, Offset end) {
+Offset getOffsetOfQuadraticAt({
+  required double t,
+  required Offset start,
+  required Offset control,
+  required Offset end,
+}) {
   return start * pow((1 - t), 2).toDouble() +
       control * 2 * t * (1 - t) +
       end * pow(t, 2).toDouble();
 }
 
 // hàm xác định điểm control của đường cong bậc 2
-Offset getControlPointOfQuadratic(double t, Offset pointAtT, Offset start, Offset end) {
-  return (pointAtT - start * pow((1 - t), 2).toDouble() - end * pow(t, 2).toDouble()) /
-      (2 * t * (1 - t));
+Offset getControlPointOfQuadratic({
+  required double t,
+  required Offset pointAtT,
+  required Offset startPoint,
+  required Offset endPoint,
+}) {
+  return (pointAtT - startPoint * pow((1 - t), 2).toDouble() - endPoint * pow(t, 2).toDouble()) / (2 * t * (1 - t));
 }
 
 // hàm xác định điểm control của đường cong bậc 3
-List<Offset> getControlPointsOfCubic(
-    double t1, Offset pointAtT1, double t2, Offset pointAtT2, Offset start, Offset end) {
+List<Offset> getControlPointsOfCubic({
+  required double t1,
+  required Offset pointAtT1,
+  required double t2,
+  required Offset pointAtT2,
+  required Offset startPoint,
+  required Offset endPoint,
+}) {
   final a1 = 3 * t1 * pow(1 - t1, 2);
   final a2 = 3 * t2 * pow(1 - t2, 2);
   final b1 = 3 * pow(t1, 2) * (1 - t1);
   final b2 = 3 * pow(t2, 2) * (1 - t2);
-  final c1 = pointAtT1 - start * pow(1 - t1, 3).toDouble() - end * pow(t1, 3).toDouble();
-  final c2 = pointAtT2 - start * pow(1 - t2, 3).toDouble() - end * pow(t2, 3).toDouble();
+  final c1 = pointAtT1 - startPoint * pow(1 - t1, 3).toDouble() - endPoint * pow(t1, 3).toDouble();
+  final c2 = pointAtT2 - startPoint * pow(1 - t2, 3).toDouble() - endPoint * pow(t2, 3).toDouble();
 
   final d = (a1 * b2) - (a2 * b1);
   final dx = (c1 * b2) - (c2 * b1);
@@ -137,13 +164,13 @@ List<Offset> getControlPointsOfCubic(
   return [dx / d, dy / d];
 }
 
-// trả về offset tương ứng với kích thước widget
-Offset interpolate(
-  Offset imageOffset,
-  double widgetWidth,
-  double widgetHeight,
-  double imageWidth,
-  double imageHeight,
-) {
+// trả về offset tương ứng với kích thước widget: widgetOffset
+Offset interpolate({
+  required Offset imageOffset,
+  required double widgetWidth,
+  required double widgetHeight,
+  required double imageWidth,
+  required double imageHeight,
+}) {
   return Offset(imageOffset.dx * widgetWidth / imageWidth, imageOffset.dy * widgetHeight / imageHeight);
 }

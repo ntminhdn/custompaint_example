@@ -74,19 +74,19 @@ class MyCustomPainter extends CustomPainter {
       if (i == 0) {
         // dịch chuyển gốc toạ độ lên phía trên, đến vị trí cách top 10 pixel
         canvas.translate(0, -(radius - clockPadding));
-        canvas.drawText('12', textStyle, 0, 0, TextAlignment.topCenter);
+        canvas.drawText(text: '12', textStyle: textStyle, x: 0, y: 0, alignment: TextAlignment.topCenter);
       } else if (i == 3) {
         // dịch chuyển gốc toạ độ sang bên phải, đến vị trí cách mép phải 10 pixel
         canvas.translate(radius - clockPadding, 0);
-        canvas.drawText('3', textStyle, 0, 0, TextAlignment.centerRight);
+        canvas.drawText(text: '3', textStyle: textStyle, x: 0, y: 0, alignment: TextAlignment.centerRight);
       } else if (i == 6) {
         // dịch chuyển gốc toạ độ xuống phía dưới, đến vị trí cách bottom 10 pixel
         canvas.translate(0, radius - clockPadding);
-        canvas.drawText('6', textStyle, 0, 0, TextAlignment.bottomCenter);
+        canvas.drawText(text: '6', textStyle: textStyle, x: 0, y: 0, alignment: TextAlignment.bottomCenter);
       } else if (i == 9) {
         // dịch chuyển gốc toạ độ sang bên trái, đến vị trí cách mép trái 10 pixel
         canvas.translate(-(radius - clockPadding), 0);
-        canvas.drawText('9', textStyle, 0, 0, TextAlignment.centerLeft);
+        canvas.drawText(text: '9', textStyle: textStyle, x: 0, y: 0, alignment: TextAlignment.centerLeft);
       } else {
         // khi i bằng 1 -> xoay 30 độ theo chiều kim đồng hồ
         // khi i bằng 2 -> xoay 60 độ theo chiều kim đồng hồ

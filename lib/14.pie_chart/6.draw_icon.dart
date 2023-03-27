@@ -169,11 +169,11 @@ class PieChartPainter extends CustomPainter {
         // vẽ text ở chính giữa line ngang
         final horizontalLineMidPoint = (bisectorEndPoint + arrowEndPoint) / 2;
         canvas.drawText(
-          '$percent%',
-          textStyle,
-          horizontalLineMidPoint.dx,
-          horizontalLineMidPoint.dy,
-          TextAlignment.bottomCenter,
+          text: '$percent%',
+          textStyle: textStyle,
+          x: horizontalLineMidPoint.dx,
+          y: horizontalLineMidPoint.dy,
+          alignment: TextAlignment.bottomCenter,
         );
       } else {
         // ngược lại, nếu % < 12% thì vẽ icon bên ngoài pie vì pie bé quá
@@ -222,11 +222,11 @@ class PieChartPainter extends CustomPainter {
           // vẽ text ở chính giữa line ngang
           final horizontalLineMidPoint = (bisectorEndPoint + arrowEndPoint) / 2;
           canvas.drawText(
-            '$percent%',
-            textStyle,
-            horizontalLineMidPoint.dx,
-            horizontalLineMidPoint.dy,
-            TextAlignment.bottomCenter,
+            text: '$percent%',
+            textStyle: textStyle,
+            x: horizontalLineMidPoint.dx,
+            y: horizontalLineMidPoint.dy,
+            alignment: TextAlignment.bottomCenter,
           );
         } else {
           // trường hợp tung độ > bán kính thì icon có khả năng đè lên nhau
@@ -284,11 +284,11 @@ class PieChartPainter extends CustomPainter {
           // vẽ text ở chính giữa line ngang
           final horizontalLineMidPoint = (bisectorEndPoint + arrowEndPoint) / 2;
           canvas.drawText(
-            '$percent%',
-            textStyle,
-            horizontalLineMidPoint.dx,
-            horizontalLineMidPoint.dy,
-            TextAlignment.bottomCenter,
+            text: '$percent%',
+            textStyle: textStyle,
+            x: horizontalLineMidPoint.dx,
+            y: horizontalLineMidPoint.dy,
+            alignment: TextAlignment.bottomCenter,
           );
 
           // lúc nảy vẽ mũi tên bên trái thì đổi sang vẽ bên phải và ngược lại
