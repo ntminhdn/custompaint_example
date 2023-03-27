@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-import 'utils.dart';
+import '../utils.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -62,15 +62,20 @@ class FlowerPainter extends CustomPainter {
         ..style = PaintingStyle.fill;
     }
 
-    // paint để vẽ hoa
+    // paint để vẽ hoa lớn
     final hoaPaint = Paint()
       ..style = PaintingStyle.fill
       ..color = const Color(0xFFfcc2ae);
 
+    // paint để vẽ hoa nhỏ
+    final hoaNhoPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = const Color(0xFFf9ad93);
+
     // paint để vẽ nhuỵ hoa
     final nhuyHoaPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = const Color(0xFFf9ad93);
+      ..color = const Color(0xFFee946f);
 
     // vẽ thân
     void drawBody() {
@@ -216,19 +221,26 @@ class FlowerPainter extends CustomPainter {
     void drawFlower() {
       canvas.save();
 
+      // tịnh tiến gốc toạ độ đến tâm của nhuỵ hoa
       final Offset newOrigin = getWidgetOffset(imageOffset: const Offset(124, 99));
       canvas.translate(newOrigin.dx, newOrigin.dy);
 
+      // offset lấy từ mobilefish và sử dụng hàm nội suy để suy ra offset tương ứng với widget
+      // 1 cánh hoa sẽ có 4 đường cong
+      // đường cong 1
       final c1 = getWidgetOffset(imageOffset: const Offset(7, -45));
       final c2 = getWidgetOffset(imageOffset: const Offset(38, -40));
       final b = getWidgetOffset(imageOffset: const Offset(36, -28));
 
+      // đường cong 2
       final c3 = getWidgetOffset(imageOffset: const Offset(44, -28));
       final c = getWidgetOffset(imageOffset: const Offset(43, -21));
 
+      // đường cong 3
       final c4 = getWidgetOffset(imageOffset: const Offset(53, -19));
       final d = getWidgetOffset(imageOffset: const Offset(47, -9));
 
+      // đường cong 4
       final c5 = getWidgetOffset(imageOffset: const Offset(56, -1));
       final c6 = getWidgetOffset(imageOffset: const Offset(42, 10));
 
@@ -238,30 +250,49 @@ class FlowerPainter extends CustomPainter {
         ..quadraticBezierTo(c4.dx, c4.dy, d.dx, d.dy)
         ..cubicTo(c5.dx, c5.dy, c6.dx, c6.dy, 0, 0);
 
+      // vẽ 1 cánh hoa lớn
       canvas.drawPath(path, hoaPaint);
+
+      // scale nhỏ lại 0.5 để vẽ cánh hoa bên trong
       canvas.save();
       canvas.scale(0.5);
-      canvas.drawPath(path, nhuyHoaPaint);
+
+      // vẽ 1 cánh hoa nhỏ.
+      // Ta vẫn truyền cái path cánh hoa ở trên vào
+      // vì ta sử dụng phép vị tự để scale nhỏ cánh hoa lớn thành cánh hoa nhỏ chứ kiểu dáng vẫn y như cánh hoa lớn
+      // nên ko cần phải tạo ra Path khác
+      canvas.drawPath(path, hoaNhoPaint);
+
+      // pop canvas về trạng thái trước khi scale để chuẩn bị rotate canvas
       canvas.restore();
 
-      const double rotateAngle = pi / 2.5;
+      // Muốn vẽ 5 cánh hoa thì lấy 360 độ / 5 tức 2 pi / 5
+      const double rotateAngle = pi * 2 / 5;
 
+      // loop 4 lần để vẽ 4 cánh hoa còn lại
       for (int i = 0; i < 4; i++) {
+        // xoay canvas
         canvas.rotate(rotateAngle);
+
+        // vẽ cánh hoa lớn
         canvas.drawPath(path, hoaPaint);
+
+        // scale nhỏ lại
         canvas.save();
         canvas.scale(0.5);
-        canvas.drawPath(path, nhuyHoaPaint);
+
+        // vẽ cánh hoa nhỏ
+        canvas.drawPath(path, hoaNhoPaint);
+
+        // pop canvas về trạng thái trước khi scale để tiếp tục rotate canvas
         canvas.restore();
       }
 
-      canvas.drawCircle(
-          Offset.zero,
-          6,
-          Paint()
-            ..style = PaintingStyle.fill
-            ..color = const Color(0xFFee946f));
+      // vẽ nhuỵ hoa
+      canvas.drawCircle(Offset.zero, 6, nhuyHoaPaint);
 
+      // pop canvas về trạng thái trước khi translate và rotate, tức là trạng thái default ban đầu
+      // ae nhớ là save() bao nhiêu lần thì phải restore() bấy nhiêu lần
       canvas.restore();
     }
 
