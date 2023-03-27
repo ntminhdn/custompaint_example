@@ -143,13 +143,14 @@ class PieChartPainter extends CustomPainter {
         // vẽ pie
         _drawPie(canvas, colors.elementAtOrNull(i), r, startAngle, sweepAngle);
 
-        // vẽ icon nằm bên trong ở chính giữa pie
+        // vẽ icon nằm bên trong ở giữa pie, mình chọn vẽ ở vị trí trung điểm đoạn phân giác
+        // Nếu isInside bằng true thì mình sẽ tô lại màu trắng cho icon thay vì để màu giống ảnh svg
         _drawIcon(
           canvas,
           iconType,
-          (intersectionPointX - iconSize.width) / 2,
-          (intersectionPointY - iconSize.height) / 2,
-          true,
+          x: (intersectionPointX - iconSize.width) / 2,
+          y: (intersectionPointY - iconSize.height) / 2,
+          isInside: true,
         );
 
         // vẽ line ngang
@@ -208,12 +209,14 @@ class PieChartPainter extends CustomPainter {
           _drawPoint(canvas, arrowEndPoint);
 
           // vẽ icon nằm ngoài pie nhưng ko phải trên cùng
+          // Nếu isInside bằng false thì mình sẽ giữ nguyên màu icon giống ảnh svg
+          // để align icon và line thẳng hàng với nhau, ta phải trừ bớt y 1 lượng bằng iconSize.height / 2
           _drawIcon(
             canvas,
             iconType,
-            bisectorEndPoint.dx >= 0 ? (width / 2) - iconSize.width : -width / 2,
-            bisectorEndPoint.dy - (iconSize.height / 2),
-            false,
+            x: bisectorEndPoint.dx >= 0 ? (width / 2) - iconSize.width : -width / 2,
+            y: bisectorEndPoint.dy - (iconSize.height / 2),
+            isInside: false,
           );
 
           // vẽ text ở chính giữa line ngang
@@ -269,12 +272,13 @@ class PieChartPainter extends CustomPainter {
           _drawPoint(canvas, arrowEndPoint);
 
           // vẽ icon nằm ngoài pie nhưng ko phải trên cùng
+          // để align icon và line thẳng hàng với nhau, ta phải trừ bớt y 1 lượng bằng iconSize.height / 2
           _drawIcon(
             canvas,
             iconType,
-            _drawOnRight ? (width / 2) - iconSize.width : -width / 2,
-            bisectorEndPoint.dy - (iconSize.height / 2),
-            false,
+            x: _drawOnRight ? (width / 2) - iconSize.width : -width / 2,
+            y: bisectorEndPoint.dy - (iconSize.height / 2),
+            isInside: false,
           );
 
           // vẽ text ở chính giữa line ngang
@@ -336,11 +340,11 @@ class PieChartPainter extends CustomPainter {
 
   void _drawIcon(
     Canvas canvas,
-    IconType iconType,
-    double x,
-    double y,
-    bool isInside,
-  ) {
+    IconType iconType, {
+    required double x,
+    required double y,
+    required bool isInside,
+  }) {
     canvas.save();
     canvas.translate(x, y);
     _drawIconByType(canvas, iconType, isInside);

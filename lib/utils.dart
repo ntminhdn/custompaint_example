@@ -137,12 +137,13 @@ List<Offset> getControlPointsOfCubic(
   return [dx / d, dy / d];
 }
 
+// trả về offset tương ứng với kích thước widget
 Offset interpolate(
-  Offset offset,
+  Offset imageOffset,
   double widgetWidth,
   double widgetHeight,
   double imageWidth,
   double imageHeight,
 ) {
-  return Offset(offset.dx * widgetWidth / imageWidth, offset.dy * widgetHeight / imageHeight);
+  return Offset(imageOffset.dx * widgetWidth / imageWidth, imageOffset.dy * widgetHeight / imageHeight);
 }
