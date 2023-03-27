@@ -63,8 +63,8 @@ class PieChartPainter extends CustomPainter {
     Colors.orange,
   ];
 
-  static const minPercentToIncludeIcon = 12;
-  static const maximumIconSize = 40;
+  static const minPercentToIncludeIcon = 12; // pie nào >= 12% thì mới vẽ icon ở trong
+  static const maximumIconSize = 40; // = icon size là 30 + 10 (khoảng cách an toàn giữa các icon)
   static const iconSize = Size(30, 30);
 
   static const textStyle = TextStyle(fontSize: 13, color: Colors.black);
@@ -87,6 +87,7 @@ class PieChartPainter extends CustomPainter {
     ..strokeCap = StrokeCap.round
     ..strokeWidth = 2;
 
+  // vẽ mũi tên về phía bên trái hay bên phải
   bool _drawOnRight = true;
 
   @override
@@ -100,19 +101,25 @@ class PieChartPainter extends CustomPainter {
     // bán kính chart
     final double r = width / 3.5;
 
-    // tỷ lệ arrow / bán kính
+    // tỷ lệ arrow / bán kính lý tưởng
     const double arrowRFactor = 1.2;
 
-    // vẽ khung
-    // canvas.drawLine(Offset.zero, Offset(width, 0), linePaint);
-    // canvas.drawLine(Offset(width, 0), Offset(width, height), linePaint);
-    // canvas.drawLine(Offset(width, height), Offset(0, height), linePaint);
-    // canvas.drawLine(Offset(0, height), Offset(0, 0), linePaint);
-    canvas.save();
-    canvas.translate(width / 2, height / 2);
+    // do chart bắt đầu từ vị trí -pi/2
     var startAngle = -pi / 2;
+
+    // tỷ lệ arrow / bán kính trong thực tế sẽ >= 1.2, vì có arrow dài, có arrow ngắn
     var factor = arrowRFactor;
+
+    // biến lưu lại tung độ của điểm giao nhau của đoạn thẳng phân giác và đường tròn của previous pie
+    // ta dùng nó để tính toán factor hợp lý sao cho các icon ko bị đè lên nhau
     var previousBisectorY = 0.0;
+
+    // trước khi translate canvas phải save
+    canvas.save();
+
+    // translate gốc toạ độ đến chính giữa hình
+    // cứ vẽ gì mà liên quan đến hình tròn thì nên translate đến tâm hình tròn cho dễ tính toạ độ
+    canvas.translate(width / 2, height / 2);
 
     for (var i = 0; i < pies.length; i++) {
       final percent = pies[i].percent;
@@ -121,14 +128,22 @@ class PieChartPainter extends CustomPainter {
       final sweepAngle = (2 * pi * percent) / 100;
       final halfSweepAngle = sweepAngle / 2;
 
+      // toạ độ điểm giao nhau giữa tia phân giác và đường tròn
       final bisectorX = r * cos(startAngle + halfSweepAngle);
       final bisectorY = r * sin(startAngle + halfSweepAngle);
 
-      // vẽ icon bên trong pie
+      // nếu % >=12% thì vẽ icon bên trong pie
       if (percent > minPercentToIncludeIcon) {
+        // lấy vector phân giác nhân factor để kéo dài tia phân giác ra 1 xí
         final bisectorEndPoint = Offset(bisectorX, bisectorY) * factor;
+
+        // vẽ tia phân giác trước vẽ pie để nó nằm dưới cái pie
         _drawLine(canvas, Offset.zero, bisectorEndPoint);
+
+        // vẽ pie
         _drawPie(canvas, colors.elementAtOrNull(i), r, startAngle, sweepAngle);
+
+        // vẽ icon nằm bên trong ở chính giữa pie
         _drawIcon(
           canvas,
           iconType,
@@ -136,11 +151,21 @@ class PieChartPainter extends CustomPainter {
           (bisectorY - iconSize.height) / 2,
           true,
         );
+
+        // vẽ line ngang
+        // y = y điểm cuối tia phân giác
+        // x = nếu vẽ ở bên phải thì = width/2, vẽ bên trái thì = -width/2
+        // ae có thể trừ bớt chiều dài của x để cái line nó ngắn lại tí cho đẹp, ví dụ mình đang để bên trái thì co lại 40 pixel
         final arrowEndPoint = Offset(
             bisectorEndPoint.dx >= 0 ? (width / 2) : -((width / 2) - maximumIconSize),
             bisectorEndPoint.dy);
+
         _drawLine(canvas, bisectorEndPoint, arrowEndPoint);
+
+        // vẽ điểm kết thúc arrow
         _drawPoint(canvas, arrowEndPoint);
+
+        // vẽ text ở chính giữa line ngang
         final middleHorizontalArrowPoint = (bisectorEndPoint + arrowEndPoint) / 2;
         canvas.drawText(
           '$percent%',
@@ -150,29 +175,39 @@ class PieChartPainter extends CustomPainter {
           TextAlignment.bottomCenter,
         );
       } else {
-        // vẽ icon bên ngoài pie
+        // ngược lại, nếu % < 12% thì vẽ icon bên ngoài pie vì pie bé quá
 
-        // chỗ này buộc phải dùng nhân vô hướng
+        // lấy vector phân giác nhân factor để kéo dài tia phân giác ra 1 xí
         final bisectorEndPoint = Offset(bisectorX, bisectorY) * factor;
 
-        // trường hợp tung độ chưa cao hơn bán kính
+        // trường hợp tung độ chưa cao hơn bán kính thì icon ko thể đè lên nhau
         if (bisectorEndPoint.dy.abs() < r) {
+          // lưu lại tung độ điểm giao của đoạn phân giác và đường tròn của previous pie
           previousBisectorY = bisectorY.abs();
-          // vẽ line chéo
+
+          // vẽ tia phân giác
           _drawLine(canvas, Offset.zero, bisectorEndPoint);
+
+          // vẽ line ngang
+          // Tương tự cách tính ở trên, y = y điểm cuối tia phân giác
+          // nhưng khác là x phải lấy width / 2 - 40,
+          // khác với ở trên, ta ko cần - 40 vì ở trên ko cần vẽ icon, nhưng ở đây phải trừ 40 để chừa chỗ vẽ icon
           final arrowEndPoint = Offset(
               bisectorEndPoint.dx >= 0
                   ? (width / 2) - maximumIconSize
                   : -((width / 2) - maximumIconSize),
               bisectorEndPoint.dy);
 
-          // vẽ line ngang
           _drawLine(
             canvas,
             bisectorEndPoint,
             arrowEndPoint,
           );
+
+          // vẽ điểm kết thúc arrow
           _drawPoint(canvas, arrowEndPoint);
+
+          // vẽ icon nằm ngoài pie nhưng ko phải trên cùng
           _drawIcon(
             canvas,
             iconType,
@@ -181,8 +216,8 @@ class PieChartPainter extends CustomPainter {
             false,
           );
 
+          // vẽ text ở chính giữa line ngang
           final middleHorizontalArrowPoint = (bisectorEndPoint + arrowEndPoint) / 2;
-
           canvas.drawText(
             '$percent%',
             textStyle,
@@ -191,29 +226,49 @@ class PieChartPainter extends CustomPainter {
             TextAlignment.bottomCenter,
           );
         } else {
+          // trường hợp tung độ > bán kính thì icon có khả năng đè lên nhau
+          // vì vậy hệ số factor nên > 1.2 để kéo dài tia phân giác ra dài hơn nữa
+
           // tính toán độ dài arrow để icon ko đè lên nhau
+          // nếu tung độ điểm giao của đoạn phân giác và đường tròn nằm ở nửa trên thì mới sợ đè nhau, nửa dưới thì ko sợ
           if (previousBisectorY > 0) {
+            // nếu khoảng cách giữa 2 điểm giao < 40 thì chắc chắn icon này sẽ đè lên previous icon
+            // 40 = icon size + 10, icon size là 30, nhưng + thêm 10 pixel để tạo khoảng trống giữa các icon
             if (bisectorY.abs() - previousBisectorY < maximumIconSize) {
+              // vậy ta cần tăng factor lên thêm nữa để kéo dài đoạn phân giác sao cho icon ko đè lên nhau
+              // sở dĩ chỉ cần maximumIconSize / 2 thay vì maximumIconSize là vì ta sẽ bố trí icon xen kẽ nhau, 1 cái bên trái thì cái tiếp theo sẽ bên phải và cứ thế
+              // tuy nhiên, để an toàn thì factor nên tăng tối thiểu là 0.2
               factor +=
                   max(((previousBisectorY + (maximumIconSize / 2)) / bisectorY.abs()) - 1, 0.2);
+              print(factor);
             }
           }
+
+          // lưu lại tung độ điểm giao của đoạn phân giác và đường tròn của previous pie
           previousBisectorY = bisectorY.abs();
 
-          // vẽ line chéo
+          // vẽ tia phân giác
           _drawLine(canvas, Offset.zero, bisectorEndPoint);
+
+          // vẽ line ngang
+          // Tương tự cách tính ở trên, y = y điểm cuối tia phân giác, x = width / 2 - 40
+          // nhưng khác 1 chỗ là ta ko xét bisectorEndPoint.dx >= 0 hay ko nữa
+          // vì chỗ này là những pie cuối nên luôn nằm bên trái, do đó chắc chắn bisectorEndPoint.dx < 0 rồi
+          // lúc này ta cần xét biến _drawOnRight đang cần vẽ bên trái hay vẽ bên phải
           final arrowEndPoint = Offset(
               _drawOnRight ? (width / 2) - maximumIconSize : -((width / 2) - maximumIconSize),
               bisectorEndPoint.dy);
 
-          // vẽ line ngang
           _drawLine(
             canvas,
             bisectorEndPoint,
             arrowEndPoint,
           );
 
+          // vẽ điểm kết thúc arrow
           _drawPoint(canvas, arrowEndPoint);
+
+          // vẽ icon nằm ngoài pie nhưng ko phải trên cùng
           _drawIcon(
             canvas,
             iconType,
@@ -222,8 +277,8 @@ class PieChartPainter extends CustomPainter {
             false,
           );
 
+          // vẽ text ở chính giữa line ngang
           final middleHorizontalArrowPoint = (bisectorEndPoint + arrowEndPoint) / 2;
-
           canvas.drawText(
             '$percent%',
             textStyle,
@@ -231,8 +286,11 @@ class PieChartPainter extends CustomPainter {
             middleHorizontalArrowPoint.dy,
             TextAlignment.bottomCenter,
           );
+
+          // lúc nảy vẽ mũi tên bên trái thì đổi sang vẽ bên phải và ngược lại
           _drawOnRight = !_drawOnRight;
         }
+        // vẽ pie
         _drawPie(canvas, colors.elementAtOrNull(i), r, startAngle, sweepAngle);
       }
 

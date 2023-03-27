@@ -43,6 +43,9 @@ class VietNamFlagPainter extends CustomPainter {
 
     canvas.drawRect(Rect.fromLTRB(0, 0, width, height), redPaint); // vẽ hình chữ nhật màu đỏ
 
+    // cách 2: thay vì dùng hàm shift để tịnh tiến Path thì mình có thể tịnh tiến cả Canvas
+    // canvas.translate(width / 2, height / 2);
+
     final pointA = Offset(0, -r);
     final pointB = Offset(r * sin(72.toRadian()), -r * cos(72.toRadian()));
     final pointC = Offset(r * sin(36.toRadian()), r * cos(36.toRadian()));
