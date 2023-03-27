@@ -97,7 +97,7 @@ class PieChartPainter extends CustomPainter {
     final double r = width / 3.5;
 
     // tỷ lệ arrow / bán kính lý tưởng
-    const double arrowRFactor = 1.2;
+    const double idealBisectorAndRadiusFactor = 1.2;
 
     // do chart bắt đầu từ vị trí -pi/2
     var startAngle = -pi / 2;
@@ -116,13 +116,13 @@ class PieChartPainter extends CustomPainter {
       final halfSweepAngle = sweepAngle / 2;
 
       // toạ độ điểm giao nhau giữa tia phân giác và đường tròn
-      final bisectorX = r * cos(startAngle + halfSweepAngle);
-      final bisectorY = r * sin(startAngle + halfSweepAngle);
+      final intersectionPointX = r * cos(startAngle + halfSweepAngle);
+      final intersectionPointY = r * sin(startAngle + halfSweepAngle);
 
       // nếu % >=12% thì vẽ icon bên trong pie
       if (percent > minPercentToIncludeIcon) {
         // lấy vector phân giác nhân factor để kéo dài tia phân giác ra 1 xí
-        final bisectorEndPoint = Offset(bisectorX, bisectorY) * arrowRFactor;
+        final bisectorEndPoint = Offset(intersectionPointX, intersectionPointY) * idealBisectorAndRadiusFactor;
 
         // vẽ tia phân giác trước vẽ pie để nó nằm dưới cái pie
         _drawLine(canvas, Offset.zero, bisectorEndPoint);
@@ -133,7 +133,7 @@ class PieChartPainter extends CustomPainter {
         // ngược lại, nếu % < 12% thì vẽ icon bên ngoài pie vì pie bé quá
 
         // lấy vector phân giác nhân factor để kéo dài tia phân giác ra 1 xí
-        final bisectorEndPoint = Offset(bisectorX, bisectorY) * arrowRFactor;
+        final bisectorEndPoint = Offset(intersectionPointX, intersectionPointY) * idealBisectorAndRadiusFactor;
 
         // vẽ tia phân giác
         _drawLine(canvas, Offset.zero, bisectorEndPoint);

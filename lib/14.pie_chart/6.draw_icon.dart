@@ -102,17 +102,17 @@ class PieChartPainter extends CustomPainter {
     final double r = width / 3.5;
 
     // tỷ lệ arrow / bán kính lý tưởng
-    const double arrowRFactor = 1.2;
+    const double idealBisectorAndRadiusFactor = 1.2;
 
     // do chart bắt đầu từ vị trí -pi/2
     var startAngle = -pi / 2;
 
     // tỷ lệ arrow / bán kính trong thực tế sẽ >= 1.2, vì có arrow dài, có arrow ngắn
-    var factor = arrowRFactor;
+    var realBisectorAndRadiusFactor = idealBisectorAndRadiusFactor;
 
     // biến lưu lại tung độ của điểm giao nhau của đoạn thẳng phân giác và đường tròn của previous pie
     // ta dùng nó để tính toán factor hợp lý sao cho các icon ko bị đè lên nhau
-    var previousBisectorY = 0.0;
+    var previousIntersectionPointY = 0.0;
 
     // trước khi translate canvas phải save
     canvas.save();
@@ -129,13 +129,13 @@ class PieChartPainter extends CustomPainter {
       final halfSweepAngle = sweepAngle / 2;
 
       // toạ độ điểm giao nhau giữa tia phân giác và đường tròn
-      final bisectorX = r * cos(startAngle + halfSweepAngle);
-      final bisectorY = r * sin(startAngle + halfSweepAngle);
+      final intersectionPointX = r * cos(startAngle + halfSweepAngle);
+      final intersectionPointY = r * sin(startAngle + halfSweepAngle);
 
       // nếu % >=12% thì vẽ icon bên trong pie
       if (percent > minPercentToIncludeIcon) {
         // lấy vector phân giác nhân factor để kéo dài tia phân giác ra 1 xí
-        final bisectorEndPoint = Offset(bisectorX, bisectorY) * factor;
+        final bisectorEndPoint = Offset(intersectionPointX, intersectionPointY) * realBisectorAndRadiusFactor;
 
         // vẽ tia phân giác trước vẽ pie để nó nằm dưới cái pie
         _drawLine(canvas, Offset.zero, bisectorEndPoint);
@@ -147,8 +147,8 @@ class PieChartPainter extends CustomPainter {
         _drawIcon(
           canvas,
           iconType,
-          (bisectorX - iconSize.width) / 2,
-          (bisectorY - iconSize.height) / 2,
+          (intersectionPointX - iconSize.width) / 2,
+          (intersectionPointY - iconSize.height) / 2,
           true,
         );
 
@@ -178,12 +178,12 @@ class PieChartPainter extends CustomPainter {
         // ngược lại, nếu % < 12% thì vẽ icon bên ngoài pie vì pie bé quá
 
         // lấy vector phân giác nhân factor để kéo dài tia phân giác ra 1 xí
-        final bisectorEndPoint = Offset(bisectorX, bisectorY) * factor;
+        final bisectorEndPoint = Offset(intersectionPointX, intersectionPointY) * realBisectorAndRadiusFactor;
 
         // trường hợp tung độ chưa cao hơn bán kính thì icon ko thể đè lên nhau
         if (bisectorEndPoint.dy.abs() < r) {
           // lưu lại tung độ điểm giao của đoạn phân giác và đường tròn của previous pie
-          previousBisectorY = bisectorY.abs();
+          previousIntersectionPointY = intersectionPointY.abs();
 
           // vẽ tia phân giác
           _drawLine(canvas, Offset.zero, bisectorEndPoint);
@@ -231,21 +231,21 @@ class PieChartPainter extends CustomPainter {
 
           // tính toán độ dài arrow để icon ko đè lên nhau
           // nếu tung độ điểm giao của đoạn phân giác và đường tròn nằm ở nửa trên thì mới sợ đè nhau, nửa dưới thì ko sợ
-          if (previousBisectorY > 0) {
+          if (previousIntersectionPointY > 0) {
             // nếu khoảng cách giữa 2 điểm giao < 40 thì chắc chắn icon này sẽ đè lên previous icon
             // 40 = icon size + 10, icon size là 30, nhưng + thêm 10 pixel để tạo khoảng trống giữa các icon
-            if (bisectorY.abs() - previousBisectorY < maximumIconSize) {
+            if (intersectionPointY.abs() - previousIntersectionPointY < maximumIconSize) {
               // vậy ta cần tăng factor lên thêm nữa để kéo dài đoạn phân giác sao cho icon ko đè lên nhau
               // sở dĩ chỉ cần maximumIconSize / 2 thay vì maximumIconSize là vì ta sẽ bố trí icon xen kẽ nhau, 1 cái bên trái thì cái tiếp theo sẽ bên phải và cứ thế
               // tuy nhiên, để an toàn thì factor nên tăng tối thiểu là 0.2
-              factor +=
-                  max(((previousBisectorY + (maximumIconSize / 2)) / bisectorY.abs()) - 1, 0.2);
-              print(factor);
+              realBisectorAndRadiusFactor +=
+                  max(((previousIntersectionPointY + (maximumIconSize / 2)) / intersectionPointY.abs()) - 1, 0.2);
+              print(realBisectorAndRadiusFactor);
             }
           }
 
           // lưu lại tung độ điểm giao của đoạn phân giác và đường tròn của previous pie
-          previousBisectorY = bisectorY.abs();
+          previousIntersectionPointY = intersectionPointY.abs();
 
           // vẽ tia phân giác
           _drawLine(canvas, Offset.zero, bisectorEndPoint);
