@@ -57,7 +57,6 @@ class _HeartBeatState extends State<HeartBeat> with SingleTickerProviderStateMix
   @override
   void didUpdateWidget(HeartBeat oldWidget) {
     _controller.reset();
-    _controller.repeat().orCancel;
     super.didUpdateWidget(oldWidget);
   }
 
@@ -86,18 +85,27 @@ class MyCustomPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final width = size.width;
     final height = size.height;
-    canvas.save();
-    canvas.translate(width, height);
-    canvas.rotate(180.0.toRadian());
-    Path heartPath = Path()
-      ..moveTo(0.5 * width, height * (0.25 + value))
-      ..cubicTo(
-          0.2 * width, height * 0.1, -(0.15 + value) * width, height * 0.6, 0.5 * width, height)
-      ..moveTo(0.5 * width, height * (0.25 + value))
-      ..cubicTo(
-          0.8 * width, height * 0.1, (1.15 + value) * width, height * 0.6, 0.5 * width, height);
+    // vẽ khung để dễ hình dung
+    // canvas.drawRect(Rect.fromLTRB(0, 0, width, height), Paint()..color=Colors.white..style=PaintingStyle.stroke);
 
-    canvas.drawPath(heartPath, redPaint);
+    // transform flip vertically
+    canvas.save();
+    canvas.flipVertically(size);
+
+    // vẽ 1 nửa trái tim bên trái
+    Path halfHeartPath = Path()
+      ..moveTo(0.5 * width, height * (0.25 + value))
+      ..cubicTo(
+          0.2 * width, height * 0.1, -(0.15 + value) * width, height * 0.6, 0.5 * width, height);
+
+    canvas.drawPath(halfHeartPath, redPaint);
+
+    // tiếp tục transform flip horizontally
+    canvas.flipHorizontally(size);
+
+    // vẽ 1 nửa trái tim bên phải còn lại
+    canvas.drawPath(halfHeartPath, redPaint);
+
     canvas.restore();
   }
 

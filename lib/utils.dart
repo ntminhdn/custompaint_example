@@ -22,6 +22,16 @@ extension ListExt<T> on List<T> {
 }
 
 extension CanvasExt on Canvas {
+  void flipHorizontally(Size canvasSize) {
+    scale(-1, 1);
+    translate(-canvasSize.width, 0);
+  }
+
+  void flipVertically(Size canvasSize) {
+   scale(1, -1);
+   translate(0, -canvasSize.height);
+  }
+
   void drawText({
     required String text,
     required TextStyle textStyle,

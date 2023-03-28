@@ -25,7 +25,7 @@ class WorldMapWidget extends StatelessWidget {
     return LayoutBuilder(
       builder: (_, constraints) => CustomPaint(
         painter: MapPainter(loadMap()),
-        size: constraints.biggest,
+        size: constraints.biggest, // to nhất có thể
       ),
     );
   }
