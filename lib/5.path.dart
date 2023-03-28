@@ -1,4 +1,3 @@
-import 'package:custompaint_example/utils.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -35,16 +34,8 @@ class MyCustomPainter extends CustomPainter {
       ..lineTo(width, height)
       ..lineTo(0, height)
       ..close();
-    canvas.rotate(30.toRadian());
-    canvas.drawArc(
-      Rect.fromCircle(center: Offset.zero, radius: 30),
-      0,
-      30.toRadian(),
-      true,
-      redPaint,
-    );
 
-    // canvas.drawPath(path, redPaint);
+    canvas.drawPath(path, redPaint);
   }
 
   @override
