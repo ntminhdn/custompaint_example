@@ -7,6 +7,15 @@ class PaintController extends ChangeNotifier {
 
   late Paint _currentPaint;
 
+  // khi sử dụng BlendMode thì có 2 khái niệm cần phân biệt là source và destinations
+  // khi vẽ bằng paint này thì nó là source, các paint còn lại là destinations
+  // Một vài blendMode phổ biến như:
+  // 1. BlendMode.clear: xoá cả source và destinations
+  // 2. BlendMode.srcOver (default): vẽ đè source lên destinations (ko xoá destination)
+  // 3. BlendMode.src: vẽ source và xoá tất cả destinations
+  // 4. BlendMode.dstOver: vẽ source nằm dưới cùng, để các destinations đè lên
+  // 5. BlendMode.dst: xoá source và giữ lại tất cả destinations
+  // Xem tất cả BlendMode kèm ví dụ minh hoạ tại đây: https://api.flutter.dev/flutter/dart-ui/BlendMode.html#clear
   final Paint _eraserPaint = Paint()
     ..strokeWidth = 20
     ..style = PaintingStyle.stroke
@@ -88,7 +97,8 @@ class PaintController extends ChangeNotifier {
   }
 
   void draw(Canvas canvas, Size size) {
-    // Để sử dụng hiệu ứng BlendMode, tức là compose nhiều nét vẽ lên nhau, ta cần gọi hàm saveLayer
+    // Để sử dụng hiệu ứng BlendMode, tức là compose nhiều nét vẽ lên nhau
+    // ta cần gọi hàm saveLayer sau đó gọi làm restore
     // Hàm saveLayer cần truyền vào Rect tức là kích thước của layer mới
     // Trường hợp này mình muốn layer mới có size = size của canvas nên truyền Rect như dưới đây
     canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
