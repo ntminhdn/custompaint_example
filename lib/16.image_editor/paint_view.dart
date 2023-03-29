@@ -21,7 +21,6 @@ class _PaintViewState extends State<PaintView> {
       onScaleUpdate: _onPaintUpdate,
       onScaleEnd: _onPaintEnd,
       child: CustomPaint(
-        willChange: true,
         painter: _CustomPainter(
           paintController: widget.paintController,
           repaint: widget.paintController,

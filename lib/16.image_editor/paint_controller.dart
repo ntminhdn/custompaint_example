@@ -88,6 +88,9 @@ class PaintController extends ChangeNotifier {
   }
 
   void draw(Canvas canvas, Size size) {
+    // Để sử dụng hiệu ứng BlendMode, tức là compose nhiều nét vẽ lên nhau, ta cần gọi hàm saveLayer
+    // Hàm saveLayer cần truyền vào Rect tức là kích thước của layer mới
+    // Trường hợp này mình muốn layer mới có size = size của canvas nên truyền Rect như dưới đây
     canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
     for (var i = 0; i < _brushPaths.length; i++) {
       for (final data in _brushPaths[i]) {
@@ -97,6 +100,8 @@ class PaintController extends ChangeNotifier {
         canvas.drawPath(data, _eraserPaint);
       }
     }
+
+    // khi gọi hàm restore thì 2 layer sẽ nhập thành 1 và hiệu ứng BlendMode sẽ được apply
     canvas.restore();
   }
 
