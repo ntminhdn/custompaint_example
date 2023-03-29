@@ -157,6 +157,8 @@ class _CanvasAreaState extends State<CanvasArea> {
         ));
   }
 
+  // dùng GestureDetector để vẽ kiếm
+  // khi add thêm điểm mới thì xoá bớt mấy điểm đầu để giới hạn chiều dài của kiếm
   GestureDetector _getGestureDetector() {
     return GestureDetector(onScaleStart: (details) {
       setState(() {
@@ -199,12 +201,14 @@ class _CanvasAreaState extends State<CanvasArea> {
     }
 
     // loop qua hết fruit, xem có point nào thuộc sword inside fruit ko
-    for (Fruit fruit in List.from(fruits)) {
+    for (Fruit fruit in List.of(fruits)) {
       for (Offset point in sword) {
+        // nếu ko va chạm, continue
         if (!fruit.isPointInside(point)) {
           continue;
         }
 
+        // nếu có va chạm, thì chém nó ra làm đôi
         _turnFruitIntoParts(fruit);
         break;
       }
@@ -215,7 +219,7 @@ class _CanvasAreaState extends State<CanvasArea> {
     FruitPart leftFruitPart = FruitPart(
       position: Offset(fruit.position.dx, fruit.position.dy), // nửa quả đầu ở vị trí fruit
       isLeft: true,
-      gravitySpeed: fruit.gravitySpeed, // tung độ = fruit
+      gravitySpeed: fruit.gravitySpeed, // tung độ = fruit lúc chưa bị cắt
       additionalForce:
           Offset(fruit.additionalForce.dx - 1, fruit.additionalForce.dy), // rơi sang trái 1 tí
     );
@@ -224,7 +228,7 @@ class _CanvasAreaState extends State<CanvasArea> {
       position: Offset(
           fruit.position.dx + fruit.width / 2, fruit.position.dy), // nửa quả sau ở vị trí w/2
       isLeft: false,
-      gravitySpeed: fruit.gravitySpeed,
+      gravitySpeed: fruit.gravitySpeed, // tung độ = fruit lúc chưa bị cắt
       additionalForce:
           Offset(fruit.additionalForce.dx + 1, fruit.additionalForce.dy), // rơi sang phải 1 tí
     );

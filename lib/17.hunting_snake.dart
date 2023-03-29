@@ -342,6 +342,10 @@ class _GameAreaState extends State<GameArea> {
           _back();
           break;
       }
+
+      // points.last là cái đầu con rắn
+      // nếu bức tường wall contains cái đầu con rắn là die
+      // hoặc nếu cái đuôi "points.sublist(0, points.length - 2)" của con rắn contains cái đầu con rắn thì cũng die
       if (points.sublist(0, points.length - 2).contains(points.last) ||
           wall.contains(points.last)) {
         _die();
@@ -426,6 +430,7 @@ class _GameAreaState extends State<GameArea> {
     }
   }
 
+  // khi ăn, đơn giản là ta add thêm point vào points (con rắn)
   void _eat() {
     score += 10;
     switch (snakeDirection) {
@@ -443,6 +448,7 @@ class _GameAreaState extends State<GameArea> {
         break;
     }
 
+    // ăn xong thì tạo cục khác
     _generateRandomBox();
   }
 
@@ -467,6 +473,7 @@ class SnakePainter extends CustomPainter {
       return;
     }
 
+    // move đến vị trí đuôi con rắn và nối từng khúc thịt của nó bằng hàm addRRect
     path.moveTo(points.first.dx, points.first.dy);
     for (int i = 0; i < points.length - 1; i++) {
       path.addRRect(_getSnakeCell(points[i]));
@@ -474,6 +481,7 @@ class SnakePainter extends CustomPainter {
 
     canvas.drawPath(path, paintObject);
 
+    // cái đầu của nó thì vẽ màu đỏ
     canvas.drawRRect(_getSnakeCell(points.last), paintObject..color = Colors.red);
   }
 
@@ -510,6 +518,10 @@ class WallPainter extends CustomPainter {
   }
 }
 
+// cách vẽ 1 vật phức tạp từ những khối nhỏ đơn giản là mình sẽ giả sử mỗi khối nhỏ là 1 dấu *
+// sau đó mình loop qua list này, ứng với dấu * sẽ vẽ 1 hình đơn giản
+// bằng cách này mình sẽ vẽ được chữ "Minh" bằng cách khối vuông
+// Khi làm game xếp hình cũng có thể dùng cách này để vẽ các khối hình
 const minh = [
   ['*', '', '', '', '*', '', '*', '', '*', '', '', '*', '', '*', '', '', '*'],
   ['*', '*', '', '*', '*', '', '*', '', '*', '*', '', '*', '', '*', '*', '*', '*'],

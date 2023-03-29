@@ -25,7 +25,7 @@ class Bezier extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: Size.infinite,
+      size: const Size(300, 300),
       painter: MyCustomPainter(),
     );
   }
@@ -44,16 +44,13 @@ class MyCustomPainter extends CustomPainter {
     final widgetWidth = size.width;
     final widgetHeight = size.height;
 
-    // local function giúp mình đỡ truyền đi truyền lại 4 biến imageWidth, imageHeight, widgetHeight, widgetWidth
-    Offset getWidgetOffset({required Offset imageOffset}) {
-      return interpolate(
-        imageOffset: imageOffset,
-        widgetWidth: widgetWidth,
-        widgetHeight: widgetHeight,
-        imageWidth: imageWidth,
-        imageHeight: imageHeight,
-      );
-    }
+    final scaleRatio = getScaleRatio(
+      canvasWidth: widgetWidth,
+      canvasHeight: widgetHeight,
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
+    );
+    canvas.scale(scaleRatio);
 
     // Để vẽ cubic curve, ta cần toạ độ điểm đầu, điểm cuối và 2 toạ độ bất kỳ từ mobilefish
     const leftMobileFishStart = Offset(124, 44);
@@ -72,16 +69,16 @@ class MyCustomPainter extends CustomPainter {
       endPoint: leftMobileFishEnd,
     );
 
-    // từ toạ độ mobilefish, ta nội suy ra toạ độ tương ứng với size của widget
-    final leftStart = getWidgetOffset(imageOffset: leftMobileFishStart);
-    final leftControl1 = getWidgetOffset(imageOffset: leftMobileFishControlPoints[0]);
-    final leftControl2 = getWidgetOffset(imageOffset: leftMobileFishControlPoints[1]);
-    final leftEnd = getWidgetOffset(imageOffset: leftMobileFishEnd);
-
     // vẽ xong leftPath
     final leftPath = Path()
-      ..moveTo(leftStart.dx, leftStart.dy)
-      ..cubicTo(leftControl1.dx, leftControl1.dy, leftControl2.dx, leftControl2.dy, leftEnd.dx, leftEnd.dy);
+      ..moveTo(leftMobileFishStart.dx, leftMobileFishStart.dy)
+      ..cubicTo(
+          leftMobileFishControlPoints[0].dx,
+          leftMobileFishControlPoints[0].dy,
+          leftMobileFishControlPoints[1].dx,
+          leftMobileFishControlPoints[1].dy,
+          leftMobileFishEnd.dx,
+          leftMobileFishEnd.dy);
 
     // dùng phép tịnh tiến để vẽ nhanh rightPath từ leftPath
     const shiftVector = Offset(180, 0);
@@ -93,7 +90,8 @@ class MyCustomPainter extends CustomPainter {
     final pocketMobileFishEnd = leftMobileFish70 + shiftVector;
 
     // Để vẽ Quadratic curve, ta cần lấy thêm điểm chính giữa túi từ mobilefish
-    const pocketMobileFish50 = Offset(256, 526);
+    final pocketMobileFish50 =
+        Offset((pocketMobileFishStart.dx + pocketMobileFishEnd.dx) / 2, 526);
 
     // Nhờ 3 điểm trên mà ta tìm được toạ độ điểm control nhờ hàm này
     // Chú ý đây chỉ là điểm control point tương ứng với mobilefish, chưa phải tương ứng với size của widget
@@ -104,17 +102,16 @@ class MyCustomPainter extends CustomPainter {
       endPoint: pocketMobileFishEnd,
     );
 
-    // từ toạ độ mobilefish, ta nội suy ra toạ độ tương ứng với size của widget
-    final pocketStart = getWidgetOffset(imageOffset: pocketMobileFishStart);
-    final pocketControl = getWidgetOffset(imageOffset: pocketMobileFishControlPoint);
-    final pocketEnd = pocketStart + shiftVector;
-
     // vẽ cái túi thần kỳ
     final centerPath = Path()
-      ..moveTo(pocketStart.dx, pocketStart.dy)
-      ..quadraticBezierTo(pocketControl.dx, pocketControl.dy, pocketEnd.dx, pocketEnd.dy)
+      ..moveTo(pocketMobileFishStart.dx, pocketMobileFishStart.dy)
+      ..quadraticBezierTo(
+          pocketMobileFishControlPoint.dx,
+          pocketMobileFishControlPoint.dy,
+          pocketMobileFishEnd.dx,
+          pocketMobileFishEnd.dy)
       ..close();
-    
+
     canvas.drawPath(leftPath, whitePaint);
     canvas.drawPath(rightPath, whitePaint);
     canvas.drawPath(centerPath, whitePaint);

@@ -1,3 +1,4 @@
+import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 
 import 'paint_data.dart';
@@ -102,14 +103,28 @@ class PaintController extends ChangeNotifier {
     // Hàm saveLayer cần truyền vào Rect tức là kích thước của layer mới
     // Trường hợp này mình muốn layer mới có size = size của canvas nên truyền Rect như dưới đây
     canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
+
     for (var i = 0; i < _brushPaths.length; i++) {
+      // vẽ nét màu
       for (final data in _brushPaths[i]) {
         canvas.drawPath(data.path, data.paint);
       }
+
+      // vẽ nét trong suốt đè lên (tức là xoá nét màu ở trên)
       for (final data in _eraserPaths[i]) {
         canvas.drawPath(data, _eraserPaint);
       }
     }
+
+    // hỏi ngu: tại sao ko dùng 1 List<Path> để lưu path như code dưới đây mà phải dùng nested List
+    // final brs = _brushPaths.flatten();
+    // final ers = _eraserPaths.flatten();
+    // for (final data in brs) {
+    //   canvas.drawPath(data.path, data.paint);
+    // }
+    // for (final data in ers) {
+    //   canvas.drawPath(data, _eraserPaint);
+    // }
 
     // khi gọi hàm restore thì 2 layer sẽ nhập thành 1 và hiệu ứng BlendMode sẽ được apply
     canvas.restore();

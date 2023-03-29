@@ -9,7 +9,9 @@ class Fruit extends GravitationalObject {
     additionalForce = const Offset(0, 0),
   }) : super(position: position, gravitySpeed: gravitySpeed, additionalForce: additionalForce);
 
-  // chỉ dùng để check kiếm chém trúng chưa, size = cái ảnh dưa hấu
+  // dùng để vẽ hình chữ nhật bao quanh trái dưa hấu
+  // Dùng hình chữ nhật đó để check kiếm chém trúng chưa
+  // chém trúng khi hình chữ nhật này contains bất kỳ point nào thuộc kiếm
   final double width = 80;
   final double height = 80;
 

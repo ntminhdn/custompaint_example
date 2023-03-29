@@ -28,8 +28,8 @@ extension CanvasExt on Canvas {
   }
 
   void flipVertically(Size canvasSize) {
-   scale(1, -1);
-   translate(0, -canvasSize.height);
+    scale(1, -1);
+    translate(0, -canvasSize.height);
   }
 
   void drawText({
@@ -37,7 +37,7 @@ extension CanvasExt on Canvas {
     required TextStyle textStyle,
     required double x,
     required double y,
-    required TextAlignment alignment,  
+    required TextAlignment alignment,
   }) {
     final span = TextSpan(
       style: textStyle,
@@ -96,7 +96,8 @@ extension CanvasExt on Canvas {
 
 Color generateRandomColor() {
   final Random random = Random();
-  return Color.fromRGBO(random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
+  return Color.fromRGBO(
+      random.nextInt(255), random.nextInt(255), random.nextInt(255), 1);
 }
 
 Path parsePathDataToPath(String pathData) {
@@ -148,7 +149,10 @@ Offset getControlPointOfQuadratic({
   required Offset startPoint,
   required Offset endPoint,
 }) {
-  return (pointAtT - startPoint * pow((1 - t), 2).toDouble() - endPoint * pow(t, 2).toDouble()) / (2 * t * (1 - t));
+  return (pointAtT -
+          startPoint * pow((1 - t), 2).toDouble() -
+          endPoint * pow(t, 2).toDouble()) /
+      (2 * t * (1 - t));
 }
 
 // hàm xác định điểm control của đường cong bậc 3
@@ -164,8 +168,12 @@ List<Offset> getControlPointsOfCubic({
   final a2 = 3 * t2 * pow(1 - t2, 2);
   final b1 = 3 * pow(t1, 2) * (1 - t1);
   final b2 = 3 * pow(t2, 2) * (1 - t2);
-  final c1 = pointAtT1 - startPoint * pow(1 - t1, 3).toDouble() - endPoint * pow(t1, 3).toDouble();
-  final c2 = pointAtT2 - startPoint * pow(1 - t2, 3).toDouble() - endPoint * pow(t2, 3).toDouble();
+  final c1 = pointAtT1 -
+      startPoint * pow(1 - t1, 3).toDouble() -
+      endPoint * pow(t1, 3).toDouble();
+  final c2 = pointAtT2 -
+      startPoint * pow(1 - t2, 3).toDouble() -
+      endPoint * pow(t2, 3).toDouble();
 
   final d = (a1 * b2) - (a2 * b1);
   final dx = (c1 * b2) - (c2 * b1);
@@ -174,13 +182,41 @@ List<Offset> getControlPointsOfCubic({
   return [dx / d, dy / d];
 }
 
-// trả về offset tương ứng với kích thước widget: widgetOffset
+// trả về offset tương ứng với kích thước của canvas
 Offset interpolate({
   required Offset imageOffset,
-  required double widgetWidth,
-  required double widgetHeight,
+  required double canvasWidth,
+  required double canvasHeight,
   required double imageWidth,
   required double imageHeight,
 }) {
-  return Offset(imageOffset.dx * widgetWidth / imageWidth, imageOffset.dy * widgetHeight / imageHeight);
+  final scaleRatio = getScaleRatio(
+    canvasWidth: canvasWidth,
+    canvasHeight: canvasHeight,
+    imageWidth: imageWidth,
+    imageHeight: imageHeight,
+  );
+
+  return imageOffset * scaleRatio;
+}
+
+// get tỷ lệ chênh lệch giữa size của ảnh gốc và size của canvas
+double getScaleRatio({
+  required double canvasWidth,
+  required double canvasHeight,
+  required double imageWidth,
+  required double imageHeight,
+}) {
+  final ratio = imageWidth / imageHeight;
+  // fitWidth
+  var imgWidth = canvasWidth;
+  var imgHeight = canvasWidth / ratio; // scale widgetHeight theo ratio
+
+  if (imgHeight > canvasHeight) {
+    // fitHeight
+    imgHeight = canvasHeight;
+    imgWidth = imgHeight * ratio; // scale widgetWidth theo ratio
+  }
+
+  return imgWidth / imageWidth;
 }

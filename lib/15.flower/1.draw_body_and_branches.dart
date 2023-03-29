@@ -36,16 +36,14 @@ class FlowerPainter extends CustomPainter {
     const imageWidth = 240.0;
     const imageHeight = 480.0;
 
-    // local function giúp mình đỡ truyền đi truyền lại 4 biến imageWidth, imageHeight, widgetHeight, widgetWidth
-    Offset getWidgetOffset({required Offset imageOffset}) {
-      return interpolate(
-        imageOffset: imageOffset,
-        widgetWidth: widgetWidth,
-        widgetHeight: widgetHeight,
-        imageWidth: imageWidth,
-        imageHeight: imageHeight,
-      );
-    }
+    final scaleRatio = getScaleRatio(
+      canvasWidth: widgetWidth,
+      canvasHeight: widgetHeight,
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
+    );
+
+    canvas.scale(scaleRatio);
 
     // paint để vẽ nhánh
     final nhanhPaint = Paint()
@@ -60,10 +58,10 @@ class FlowerPainter extends CustomPainter {
       // sở dĩ mình ko cần sử dụng hàm getControlPointsOfCubic vì khi mình vẽ cái này, mình ko cần phải quá chính xác
       // nên mình dựa vào giác quan thứ 6 để dự đoán chính xác các điểm control mà ko cần dùng hàm để suy ra
       // nếu ae thích chính xác thì cứ dùng hàm getControlPointsOfCubic giống ví dụ về con sông và túi thần kỳ nhá
-      final Offset start = getWidgetOffset(imageOffset: const Offset(165, 419));
-      final Offset control1 = getWidgetOffset(imageOffset: const Offset(57, 297));
-      final Offset control2 = getWidgetOffset(imageOffset: const Offset(159, 219));
-      final Offset end = getWidgetOffset(imageOffset: const Offset(128, 120));
+      const start = Offset(165, 419);
+      const control1 = Offset(57, 297);
+      const control2 = Offset(159, 219);
+      const end = Offset(128, 120);
 
       canvas.drawPath(
           Path()
@@ -75,10 +73,10 @@ class FlowerPainter extends CustomPainter {
     // vẽ nhánh 1
     void drawNhanh1() {
       // offset lấy từ mobilefish và sử dụng hàm nội suy để suy ra offset tương ứng với widget
-      final Offset start = getWidgetOffset(imageOffset: const Offset(117, 326));
-      final Offset control1 = getWidgetOffset(imageOffset: const Offset(135, 291));
-      final Offset control2 = getWidgetOffset(imageOffset: const Offset(158, 273));
-      final Offset end = getWidgetOffset(imageOffset: const Offset(189, 262));
+      const start = Offset(117, 326);
+      const control1 = Offset(135, 291);
+      const control2 = Offset(158, 273);
+      const end = Offset(189, 262);
 
       canvas.drawPath(
           Path()
@@ -90,10 +88,10 @@ class FlowerPainter extends CustomPainter {
     // vẽ nhánh 2
     void drawNhanh2() {
       // offset lấy từ mobilefish và sử dụng hàm nội suy để suy ra offset tương ứng với widget
-      final Offset start = getWidgetOffset(imageOffset: const Offset(115, 285));
-      final Offset control1 = getWidgetOffset(imageOffset: const Offset(105, 253));
-      final Offset control2 = getWidgetOffset(imageOffset: const Offset(81, 230));
-      final Offset end = getWidgetOffset(imageOffset: const Offset(46, 218));
+      const start = Offset(115, 285);
+      const control1 = Offset(105, 253);
+      const control2 = Offset(81, 230);
+      const end = Offset(46, 218);
 
       canvas.drawPath(
           Path()
@@ -105,10 +103,10 @@ class FlowerPainter extends CustomPainter {
     // vẽ nhánh 3
     void drawNhanh3() {
       // offset lấy từ mobilefish và sử dụng hàm nội suy để suy ra offset tương ứng với widget
-      final Offset start = getWidgetOffset(imageOffset: const Offset(121, 246));
-      final Offset control1 = getWidgetOffset(imageOffset: const Offset(119, 209));
-      final Offset control2 = getWidgetOffset(imageOffset: const Offset(102, 175));
-      final Offset end = getWidgetOffset(imageOffset: const Offset(71, 140));
+      const start = Offset(121, 246);
+      const control1 = Offset(119, 209);
+      const control2 = Offset(102, 175);
+      const end = Offset(71, 140);
 
       canvas.drawPath(
           Path()
@@ -120,10 +118,10 @@ class FlowerPainter extends CustomPainter {
     // vẽ nhánh 4
     void drawNhanh4() {
       // offset lấy từ mobilefish và sử dụng hàm nội suy để suy ra offset tương ứng với widget
-      final Offset start = getWidgetOffset(imageOffset: const Offset(121, 246));
-      final Offset control1 = getWidgetOffset(imageOffset: const Offset(127, 204));
-      final Offset control2 = getWidgetOffset(imageOffset: const Offset(146, 170));
-      final Offset end = getWidgetOffset(imageOffset: const Offset(182, 145));
+      const start = Offset(121, 246);
+      const control1 = Offset(127, 204);
+      const control2 = Offset(146, 170);
+      const end = Offset(182, 145);
 
       canvas.drawPath(
           Path()
