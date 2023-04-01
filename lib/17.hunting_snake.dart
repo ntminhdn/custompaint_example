@@ -160,6 +160,7 @@ class GameArea extends StatefulWidget {
 }
 
 class _GameAreaState extends State<GameArea> {
+  // ta chỉ cần lưu vị trí top-left của từng khối thịt là có thể vẽ được con rắn rồi
   List<Offset> points = [];
   SnakeDirection snakeDirection = SnakeDirection.forward;
   Timer? timer;
@@ -395,18 +396,24 @@ class _GameAreaState extends State<GameArea> {
   }
 
   void _forward() {
+    // loop qua từng khối thịt của con rắn
     for (int i = 0; i < points.length; i++) {
       if (i == points.length - 1) {
+        // cái đầu con rắn sẽ tịnh tiến thêm 1 đoạn (width, 0)
         points[i] = points[i] + const Offset(width, 0);
+
+        // nếu sau khi tịnh tiến mà quá maxWidth (góc phải màn hình) thì cho nó xuất hiện lại vị trí góc trái màn hình
         if (points[i].dx > widget.maxWidth) {
           points[i] = Offset(0, points[i].dy);
         }
 
+        // nếu cái đầu của nó chạm vào cục thịt thì cho nó ăn thịt
         if (points[i] == box) {
           _eat();
           break;
         }
       } else {
+        // khối thịt sau = khối thịt liền trước nó
         points[i] = points[i + 1];
       }
     }
@@ -430,11 +437,14 @@ class _GameAreaState extends State<GameArea> {
     }
   }
 
-  // khi ăn, đơn giản là ta add thêm point vào points (con rắn)
   void _eat() {
+    // cập nhật lại điểm số
     score += 10;
+
+    // khi ăn, đơn giản là ta insert 1 khối thịt (Offset) cho nó tại vị trí 0 (vị trí đuôi)
     switch (snakeDirection) {
       case SnakeDirection.forward:
+        // toạ độ vị trí đuôi là points.first.dx, trừ bớt width để tạo ra khối thịt mới ở sau vị trí đuôi
         points.insert(0, Offset(points.first.dx - width, points.first.dy));
         break;
       case SnakeDirection.upward:
