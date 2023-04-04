@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:touchable/touchable.dart';
 
 import 'map_utils.dart';
 import 'paint_data.dart';
@@ -24,9 +25,12 @@ class WorldMapWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (_, constraints) => CustomPaint(
-        painter: MapPainter(loadMap()),
-        size: constraints.biggest, // to nhất có thể
+      builder: (_, constraints) => CanvasTouchDetector(
+        gesturesToOverride: const [GestureType.onTapDown],
+        builder: (context) => CustomPaint(
+          painter: MapPainter(loadMap(), context),
+          size: constraints.biggest, // to nhất có thể
+        ),
       ),
     );
   }
@@ -34,11 +38,13 @@ class WorldMapWidget extends StatelessWidget {
 
 class MapPainter extends CustomPainter {
   final List<PaintData> paints;
-
-  MapPainter(this.paints);
+  final BuildContext context;
+  MapPainter(this.paints, this.context);
 
   @override
   void paint(Canvas canvas, Size size) {
+    final touchyCanvas = TouchyCanvas(context, canvas);
+
     const ratio = worldMapWidth / worldMapHeight;
     final canvasWidth = size.width;
     final canvasHeight = size.height;
@@ -49,10 +55,6 @@ class MapPainter extends CustomPainter {
     // Để code 1 widget fitWidth, ta gán widgetWidth = canvasWidth (full width) và scale widthHeight theo ratio để widget của chúng ta có tỷ lệ w/h = với của svg
     var widgetWidth = canvasWidth;
     var widgetHeight = canvasWidth / ratio; // scale widgetHeight theo ratio
-
-    print('svgSize: $worldMapWidth, $worldMapHeight, ratio = ${widgetWidth/widgetHeight}');
-    print('canvasSize thực tế: $canvasWidth, $canvasHeight, ratio = ${canvasWidth/canvasHeight}');
-    print('widgetSize mong muốn: $widgetWidth, $widgetHeight, ratio = ${widgetWidth/widgetHeight}');
 
     // Tuy nhiên, nếu sau khi scale Height mà widget Height vượt quá canvas Height thì ko ổn
     // khi đó, ta phải chuyển sang fitHeight, ko thể fitWidth được
@@ -65,15 +67,32 @@ class MapPainter extends CustomPainter {
 
     canvas.save();
 
+    // CHÚ Ý: khi implement touchable thì không thể sử dụng canvas transformation
     // 1 công thức rất hay để dịch chuyển 1 widget vào chính giữa canvas
-    canvas.translate((canvasWidth - widgetWidth) / 2, (canvasHeight - widgetHeight) / 2);
+    // canvas.translate((canvasWidth - widgetWidth) / 2, (canvasHeight - widgetHeight) / 2);
 
+    // CHÚ Ý: khi implement touchable thì không thể sử dụng canvas transformation
     // tương tự như bản đồ VN, mình cũng cần scale theo tỷ lệ widgetSize / svgSize
-    canvas.scale(widgetWidth / worldMapWidth, widgetHeight / worldMapHeight);
+    // canvas.scale(widgetWidth / worldMapWidth, widgetHeight / worldMapHeight);
 
     // loop qua từng Path của từng quốc gia một và vẽ thôi
     for (final element in paints) {
-      canvas.drawPath(element.path, element.paint);
+      // vì ko sử dụng được canvas transformation nên mình phải sử dụng hàm transform của Path để scale cái Path
+      touchyCanvas.drawPath(element.path
+          .shift(Offset((canvasWidth - widgetWidth) / 2, (canvasHeight - widgetHeight) / 2))
+          .transform(Matrix4(
+        widgetWidth / worldMapWidth,0,0,0,
+        0,widgetHeight / worldMapHeight,0,0,
+        0,0,1,0,
+        0,0,0,1,
+      ).storage),
+          element.paint,
+          onTapDown: (tapDetail) {
+        print('ID: ${element.regionId}, offset: ${tapDetail.localPosition}');
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+            content: Text(
+                'ID: ${element.regionId}, offset: ${tapDetail.localPosition}')));
+      });
     }
 
     canvas.restore();

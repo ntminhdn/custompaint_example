@@ -4,11 +4,15 @@ import 'paint_data.dart';
 import '../utils.dart';
 
 List<PaintData> loadMap() {
-  return worldMapPaths.values
-      .map((pathData) => PaintData(
+  return worldMapPaths
+      .map((key, pathData) => MapEntry(
+          key,
+          PaintData(
+            key,
             parsePathDataToPath(pathData),
             Paint()..color = generateRandomColor(),
-          ))
+          )))
+      .values
       .toList(growable: false);
 }
 

@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   svg_path_parser: 1.1.1
   dartx: 1.1.0
+  touchable: 1.0.2
 
 dev_dependencies:
   flutter_test:
