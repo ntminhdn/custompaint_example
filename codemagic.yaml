@@ -1,0 +1,24 @@
+workflows:
+  build_android:
+    name: Build Android
+    environment:
+      flutter: 3.10.5
+      android_signing:
+        - keystore_reference
+    scripts:
+      - name: Set up local.properties
+        script: | 
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: | 
+          flutter packages pub get
+      - name: Build AAB with Flutter
+        script: | 
+          flutter build appbundle --release
+    publishing:
+      email:
+        recipients:
+          - ntminhdn@gmail.com
+        notify:
+          success: true
+          failure: true
